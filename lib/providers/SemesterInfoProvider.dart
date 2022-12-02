@@ -14,7 +14,7 @@ class SemesterInfoProvider extends ChangeNotifier{
     print('url '+url.toString());
     final response = await http.get(url);
 
-    print(response.body);
+    print(response.headers);
   }
 
 
