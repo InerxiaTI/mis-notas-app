@@ -16,7 +16,7 @@ class Subject {
   int subjectId;
   int subjectPensumId;
   String subjectName;
-  int credits;
+  int credits = 0;
   dynamic teacher;
   String status;
   double grade;
