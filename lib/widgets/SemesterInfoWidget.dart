@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:mis_notas/models/SemesterWithSubjectsGradeDto.dart';
+import 'package:mis_notas/providers/SemesterInfoProvider.dart';
 import 'package:mis_notas/widgets/SemesterSubjectListWidget.dart';
+import 'package:provider/provider.dart';
+
+import '../models/SemesterInfoResponse.dart';
+import '../models/Subject.dart';
 
 class SemesterInfoWidget extends StatelessWidget {
   final List<Map<String, String>> listOfColumns = [
@@ -19,8 +25,14 @@ class SemesterInfoWidget extends StatelessWidget {
   ];
   @override
   Widget build(BuildContext context) {
+    final semesterInfoProvider = Provider.of<SemesterInfoProvider>(context);
+    semesterInfoProvider.getOnDisplay();
+
+    print("ON WIDGET");
+    print(semesterInfoProvider.semesterInfoResponseProvider?.body?.subjects[0].subjectPensumId.toString());
+
     return Column(children: [
-      _semesterInfo(),
+      _semesterInfo(semesterInfoProvider.semesterInfoResponseProvider),
       Card(
         child: Container(
             height: 40,
@@ -35,12 +47,15 @@ class SemesterInfoWidget extends StatelessWidget {
             )),
       ),
       Expanded(
-        child: _semesterSubjectList(),
+        child: _semesterSubjectList(semesterInfoProvider.semesterInfoResponseProvider),
       )
     ]);
   }
 
-  Widget _semesterInfo() {
+  Widget _semesterInfo(SemesterInfoResponse? semesterInfoResponse) {
+    final semesterInfo = semesterInfoResponse?.body;
+    final semestre = semesterInfo?.semesterLevel;
+
     return Container(
         width: double.infinity,
         color: Colors.blue,
@@ -49,34 +64,47 @@ class SemesterInfoWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Semestre X'),
-            Text('Nivel 5'),
-            Text('Cantidad de materias: 3'),
-            Text('Fecha inicio: 2022-01-01'),
-            Text('Fecha fin: 2022-01-01')
+            Text(String.fromCharCode(semestre!)),
+            Text(semestre!.toString()),
+            Text('Cantidad de materias: ${semesterInfo?.numberSubjects}'),
+            Text('Fecha inicio: ${semesterInfo?.startDate}'),
+            Text('Fecha fin: ${semesterInfo?.endDate}')
           ],
         ));
   }
 
-  Widget _semesterSubjectList() {
+  Widget _semesterSubjectList(SemesterInfoResponse? semesterInfoResponse) {
     /*return ListView(
         shrinkWrap: true,
         physics: AlwaysScrollableScrollPhysics(),
         primary: false,
         children: []);*/
 
+    final List<Subject>? subjects = semesterInfoResponse?.body?.subjects;
+
     return ListView.builder(
       scrollDirection: Axis.vertical,
       shrinkWrap: true,
-      itemCount: 7,
-      itemBuilder: (_, int index) => _Subject(),
+      itemCount: subjects?.length,
+      itemBuilder: (_, int index) {
+        final subject = subjects?[index];
+        return _Subject(subject: subject,);
+      },
     );
   }
 }
 
 class _Subject extends StatelessWidget {
+
+ final Subject? subject;
+
+  const _Subject({super.key, this.subject});
+
+
   @override
   Widget build(BuildContext context) {
+
+
     return GestureDetector(
         onTap: () => Navigator.pushNamed(context, 'subject-notes',
             arguments: 'subject-notes'),
@@ -87,7 +115,7 @@ class _Subject extends StatelessWidget {
             children: [
               Expanded(
                   child: Text(
-                'Fisica mecanica',
+                subject!.subjectName,
                 overflow: TextOverflow.clip,
                 style: new TextStyle(
                   fontSize: 13.0,
@@ -98,7 +126,7 @@ class _Subject extends StatelessWidget {
               )),
               Expanded(
                 child: Text(
-                  '4',
+                  subject!.credits.toString(),
                   overflow: TextOverflow.ellipsis,
                   style: new TextStyle(
                     fontSize: 13.0,
@@ -110,7 +138,7 @@ class _Subject extends StatelessWidget {
               ),
               Expanded(
                 child: Text(
-                  '3.4',
+                  subject!.grade.toString(),
                   overflow: TextOverflow.clip,
                   style: new TextStyle(
                     fontSize: 13.0,

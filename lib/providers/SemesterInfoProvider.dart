@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mis_notas/models/SemesterInfoResponse.dart';
 
 class SemesterInfoProvider extends ChangeNotifier{
 
-  SemesterInfoProvider(){
-    print('Semester');
-    this.getOnDisplay();
-  }
+  SemesterInfoResponse? semesterInfoResponseProvider;
 
-  getOnDisplay() async {
+  Future getOnDisplay() async {
     print('Hola');
-    var url = Uri.http('10.0.2.2:8081','/api/subject/get-semester-subjects/4');
-    print('url '+url.toString());
+    var url = Uri.http('192.168.1.171:8081','/api/subject/get-semester-subjects/4');
+    print('url $url');
     final response = await http.get(url);
+    final semesterInfoResponse = SemesterInfoResponse.fromJson(response.body);
 
-    print(response.headers);
+    print(semesterInfoResponse.body?.subjects[0].subjectPensumId);
+    this.semesterInfoResponseProvider = semesterInfoResponse;
+    print("HOLA MUNDOA");
   }
 
 
