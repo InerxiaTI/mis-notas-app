@@ -13,7 +13,7 @@ class SemesterInfoProvider extends ChangeNotifier{
 
   Future getOnDisplay() async {
     print('Hola');
-    var url = Uri.http('192.168.1.171:8081','/api/subject/get-semester-subjects/4');
+    var url = Uri.http('192.168.1.161:8081','/api/subject/get-semester-subjects/4');
     print('url $url');
     final response = await http.get(url);
     final semesterInfoResponse = SemesterInfoResponse.fromJson(response.body);

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:mis_notas/models/SubjectNotesInfoDto.dart';
 
 import '../models/SemesterInfoResponse.dart';
+import '../models/SemesterWithSubjectsGradeDto.dart';
 import '../models/Subject.dart';
 
 class SemesterInfoWidget extends StatelessWidget {
@@ -68,7 +70,7 @@ class SemesterInfoWidget extends StatelessWidget {
       itemCount: listSize,
       itemBuilder: (_, int index) {
         final subject = subjects?[index];
-        return _Subject(subject: subject,);
+        return _Subject(subject: subject, semesterWithSubjectsGradeDto: semesterInfoResponse?.body,);
       },
     );
   }
@@ -77,8 +79,9 @@ class SemesterInfoWidget extends StatelessWidget {
 class _Subject extends StatelessWidget {
 
   final Subject? subject;
+  final SemesterWithSubjectsGradeDto? semesterWithSubjectsGradeDto;
 
-  const _Subject({super.key, this.subject});
+  const _Subject({super.key, this.subject, required this.semesterWithSubjectsGradeDto});
 
 
   @override
@@ -88,9 +91,15 @@ class _Subject extends StatelessWidget {
     final subjectCredits = (subject?.credits)==null?0:subject!.credits;
     final subjectGrade = (subject?.grade)==null?0.0:subject!.grade;
 
+    final subjectNotesInfoDto = new SubjectNotesInfoDto(
+        subject: subject,
+        semesterId: semesterWithSubjectsGradeDto?.semesterId,
+        studentId:  semesterWithSubjectsGradeDto?.studentId
+    );
+
     return GestureDetector(
         onTap: () => Navigator.pushNamed(context, 'subject-notes',
-            arguments: subjectName),
+            arguments: subjectNotesInfoDto),
         child: Container(
             child: ListTile(
               title: Row(
